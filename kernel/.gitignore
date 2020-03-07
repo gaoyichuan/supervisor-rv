@@ -1,3 +1,4 @@
 kernel.bin
 kernel.asm
+bootrom.coe
 .config_*

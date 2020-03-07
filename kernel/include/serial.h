@@ -2,11 +2,11 @@
 
 // For QEMU, use 0x10000000
 // For AXI Uart16550, use base+0x1000
-#define COM1                0x10000000
+#define COM1                0x10001000
 
 // For AXI Uart16550, use 4
 // For QEMU, use 1
-#define COM_MULTIPLY        1
+#define COM_MULTIPLY        4
 
 #define COM_RBR_OFFSET      (0 * COM_MULTIPLY)   /* In:  Recieve Buffer Register */
 #define COM_THR_OFFSET      (0 * COM_MULTIPLY)   /* Out: Transmitter Holding Register */
@@ -36,7 +36,7 @@
 #define COM_LCR_DLAB        0x80
 // For AXI Uart16550, use clk_freq / 16 / baudrate
 // For QEMU, use 115200 / 9600
-#define COM_DLL_VAL         (115200 / 9600)
+#define COM_DLL_VAL         54
 #define COM_LCR_WLEN8       0x03
 #define COM_LCR_CONFIG      (COM_LCR_WLEN8 & ~(COM_LCR_DLAB))
 #define COM_IER_RDI         0x01

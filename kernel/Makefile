@@ -5,6 +5,7 @@ GCCPREFIX := riscv64-unknown-elf-
 LD	:= $(GCCPREFIX)ld
 CC	:= $(GCCPREFIX)gcc
 AS  := $(GCCPREFIX)as
+BIN2COE := bin2coe
 OBJDUMP := $(GCCPREFIX)objdump
 MODULE	:= init
 OBJDIR	:= obj
@@ -44,7 +45,7 @@ CONFIG_FILE := .config_$(BITS)_$(EN_INT)_$(EN_PAGING)_$(EN_FENCEI)
 
 .PHONY: all clean show-utest sim debug inst
 
-all: checkdirs $(TARGET) kernel.bin kernel.asm
+all: checkdirs $(TARGET) kernel.bin kernel.asm bootrom.coe
 
 $(CONFIG_FILE):
 	@rm -f .config_*
@@ -62,10 +63,13 @@ $(OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.S $(CONFIG_FILE) $(HEADER)
 	$(CC) -o $@ $< -c -I$(INCLUDE) $(ASFLAGS)
 
 kernel.bin: $(TARGET)
-	@$(GCCPREFIX)objcopy -j .text -j .text.* -O binary -v $< $@
+	@$(GCCPREFIX)objcopy -j .text -j .text.* -j .rodata -O binary -v --pad-to 0x80010000 $< $@
 
 kernel.asm: $(TARGET)
 	@$(GCCPREFIX)objdump -d -S $< > $@
+
+bootrom.coe: kernel.bin
+	$(BIN2COE) -i $< -o $@ -w 32 -r 16
 
 show-utest: $(TARGET)
 	@$(GCCPREFIX)objdump -D $< | grep "^[0-9a-f]\{8,16\} <UTEST_" | grep -n --color=auto 'UTEST_'

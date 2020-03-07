@@ -6,7 +6,15 @@ OUTPUT_FORMAT("elf32-littleriscv")
 PROVIDE(KERNEL_STACK_INIT = 0x80800000);
 SECTIONS
 {
-    . = 0x807F0000;
+    /* Read-only memory */
+    /* kernel code: 0x80000000 - 0x80007FFF */
+    /* utest: 0x80008000 - 0x8000BFFF */
+    /* kernel rodata: 0x8000C000 - 0x8000FFFF */
+
+    /* Read-Write memory */
+    /* user rw data: 0x40000000 - 0x400EFFFF */
+    /* kernel rw data: 0x400F0000 - 0x400FFFFF */
+    . = 0x400F0000;
     .bss : {
         _sbss = .;         /* define a global symbol at bss start */
         *(.bss.uregs)
@@ -14,6 +22,8 @@ SECTIONS
         . = ALIGN(4);
         _ebss = .;         /* define a global symbol at bss end */
     }
+    
+    . = 0x8000C000;
     .rodata : {
         *(.rodata)
     }
@@ -23,7 +33,8 @@ SECTIONS
     .text : {
         KEEP (*(.text.init))
         *(.text)
-        . = ALIGN(0x1000); /* "fixed" utest address */
+        . = ALIGN(0x8000); /* "fixed" utest address */
         *(.text.utest)
     }
+    . = ALIGN(32);
 }
